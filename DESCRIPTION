@@ -1,0 +1,12 @@
+Package: loadCurves
+Title: App to generate load curves
+Type: Shiny
+Version: 0.0.0.9000
+Authors@R: person("Markus", "Döring", email = "m4rkus.doering@gmail.com",
+                  role = c("aut", "cre"))
+Description: A Shiny app to generate JSON and MSCONS output to be used in [powercloud](https://power.cloud)
+BugReports: 
+    http://www.github.com/flrd/loadCurves/issues
+License: GPL (>= 3)
+Encoding: UTF-8
+RoxygenNote: 7.1.2
