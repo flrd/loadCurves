@@ -185,7 +185,10 @@ ui <- fixedPage(
 
 
         mainPanel(
-          verbatimTextOutput("outputMessage")
+          verbatimTextOutput("outputMessage") |>
+            
+            # make the text output editable
+            htmltools::tagAppendAttributes(contenteditable="true")
           )
     )
 )
@@ -318,7 +321,8 @@ server <- function(input, output) {
           loadCurves[["loadCurveSets"]] <- loadCurveSets
           
           return(toJSON(list("loadCurves" = loadCurves), pretty = TRUE))
-        } else {
+        
+          } else {
           msconsOutput(
             sender = input$marketPartnerNumber
             ,receiver = input$receiver
@@ -337,30 +341,6 @@ server <- function(input, output) {
 
     output$outputMessage <- renderPrint(outputMessage())
     
-
-# generate plot output ----------------------------------------------------
-    
-    # hPlot <- eventReactive(input$generate, ignoreInit = TRUE, {
-    #     return(hchart(
-    #         # data.frame('timestamp' = Sys.Date() - 5:0, 'quantity' = 1:6)
-    #         data.frame(
-    #             'timestamp' = timeSeries()$timestamp,
-    #             'quantity' = timeSeries()$quantity
-    #         )
-    #         
-    #         # timeSeries()
-    #         ,"line"
-    #         ,hcaes_string(x = 'timestamp',
-    #                      y = 'quantity')
-    #     ))
-    #     
-    # })
-    #     
-    # 
-    # output$plot <- renderHighchart(
-    #     hPlot()
-    # )
-
 }
 
 # Run the application 
