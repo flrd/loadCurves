@@ -186,7 +186,6 @@ ui <- fixedPage(
 
         mainPanel(
           verbatimTextOutput("outputMessage") |>
-            
             # make the text output editable
             htmltools::tagAppendAttributes(contenteditable="true")
           )
