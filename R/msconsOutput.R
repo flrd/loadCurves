@@ -50,6 +50,7 @@ msconsOutput <- function(
       ,valuesMSCONS(
         timestamp = timeSeries,
         quantity = round(pi, 4)
+      )
       ,sprintf("UNT+%d+DCBKCICHBBCFBG'", UNT)
       ,"UNZ+1+DCBKCICHBBCECD'"
       )
