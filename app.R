@@ -9,20 +9,13 @@
 
 library(shiny)
 library(jsonlite)
-# library(highcharter)
 library(shinyjs)
 library(bslib)
 library(tippy)
 library(shinyFeedback)
 
-# define today's date outside of app
-# later used in the dateRangeinput 
+
 today <- Sys.Date()
-
-
-
-# include javascript ------------------------------------------------------
-# tags$head(HTML("<script type='text/javascript' src='js/copy.js'></script>"))
 
 
 
@@ -63,10 +56,6 @@ ui <- fixedPage(
     sidebarLayout(
                   
         sidebarPanel(
-          
-          tippy(h3("Hello"), "World"),
-          h4("World", id = "theId"),
-          tippy_this("theId", "A tooltip"),
 
 # energy type -------------------------------------------------------------
 
