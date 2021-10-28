@@ -7,14 +7,14 @@
 #    http://shiny.rstudio.com/
 #
 
+# attach packages
 library(shiny)
 library(jsonlite)
 library(shinyjs)
 library(bslib)
 library(tippy)
-library(shinyFeedback)
 
-
+# get today's date
 today <- Sys.Date()
 
 
@@ -41,10 +41,7 @@ ui <- fixedPage(
 
     # Set up shinyjs
     shinyjs::useShinyjs(),
-    
-    # set up shiny feedback
-    # shinyFeedback::useShinyFeedback(),
-    
+
     # tippy 
     use_tippy(),
     
@@ -54,8 +51,10 @@ ui <- fixedPage(
 
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
+      #position = "right"
+      #, fluid = FALSE,
                   
-        sidebarPanel(
+        sidebarPanel(width = 3,
 
 # energy type -------------------------------------------------------------
 
@@ -141,9 +140,11 @@ ui <- fixedPage(
             "Interval",
             choices =
                 list(
-                    "15 minutes" = "15 mins",
-                    "60 minutes" = "hour",
-                    "1 day" = "day"),
+                  "5 minutes" = "5 mins",
+                  "15 minutes" = "15 mins",
+                  "30 minutes" = "30 mins",
+                  "60 minutes" = "hour",
+                  "1 day" = "day"),
             selected = "hour"),
 
 
@@ -184,7 +185,7 @@ ui <- fixedPage(
 ),
 
 
-        mainPanel(
+        mainPanel(width = 9,
           verbatimTextOutput("outputMessage") |>
             # make the text output editable
             htmltools::tagAppendAttributes(contenteditable="true")
@@ -229,6 +230,17 @@ server <- function(input, output) {
         )
         }
     )
+    
+    # show a notification when copy button was clicked
+    observeEvent(input$copyToClipboard, {
+      showNotification(
+        "Message copied!",
+        closeButton = FALSE,
+        duration = 2.5,
+        type = "default"
+      )
+    })
+    
 
     # limit the maximum allowed characters in the Market location input
     # 11 : if energy type is electricity (MaLo-ID)
@@ -264,7 +276,9 @@ server <- function(input, output) {
       valueInterval <- reactive({ 
         switch(
           EXPR = input$interval,
+          "5 mins" = 5L,
           "15 mins" = 15L,
+          "30 mins" = 30L,
           "hour" = 60L,
           "day" = 1440L
         )
