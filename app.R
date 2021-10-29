@@ -234,7 +234,7 @@ server <- function(input, output) {
     # show a notification when copy button was clicked
     observeEvent(input$copyToClipboard, {
       showNotification(
-        "Message copied!",
+        "Output copied!",
         closeButton = FALSE,
         duration = 2.5,
         type = "default"
@@ -296,7 +296,7 @@ server <- function(input, output) {
       })
       
       timeSeries <- reactive(
-        valuesJSON( # -----> to be replaced with function values() when valuesMSCONS() is finished
+        valuesJSON(
           timestamp = timeSequenceJSON()
           ,quantity = quantityRandom(
             n = length(timeSequenceJSON())
@@ -348,6 +348,7 @@ server <- function(input, output) {
               ,msconsFormat = TRUE
               )
             ,quantity = pi
+            ,energyType = input$energyType
             )
           }
         })      

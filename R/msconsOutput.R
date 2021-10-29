@@ -5,13 +5,15 @@ msconsOutput <- function(
   ,register = NULL
   ,timeSeries
   ,quantity
+  ,energyType
   ) {
   
+  # we extract the first and last values from the 
   periodStart <- timeSeries[1L]
   periodEnd <- timeSeries[length(timeSeries)]
   
   # UNT is the number of segment from UNH to UNT (both included)
-  UNT <- 13L + pmax(2, length(timeSeries) - 1L) * 3 + 1L
+  UNT <- 13L + pmax(1L, length(timeSeries) - 1L) * 3 + 1L
   
   
   
@@ -22,12 +24,14 @@ msconsOutput <- function(
   PIA <- PIAsegment(register)
   
   # if user did not provide input, then add a {{Placeholder}}
-  UNB <- UNB_NADsegments(sender, receiver)[["UNB"]]
+  UNB <- UNB_NADsegments(sender, receiver, energyType)[["UNB"]]
   
-  NADsegments <- UNB_NADsegments(sender, receiver)
+  NADsegments <- UNB_NADsegments(sender, receiver, energyType)
   NAD_S <- NADsegments[["NAD_S"]]
   NAD_R <- NADsegments[["NAD_R"]]
   LOC <- LOCsegment(marketLocation)
+  
+  RFF <- RFFsegment(energyType)
   
   # here comes single the pieces
   writeLines(
@@ -37,7 +41,7 @@ msconsOutput <- function(
       ,"UNH+DCBKCICHBBCFBG+MSCONS:D:04B:UN:2.3c'"
       ,"BGM+7+04372109171600149903913000003056310+9'"
       ,"DTM+137:202103171500:203'"
-      ,"RFF+Z13:13018'"
+      ,RFF
       ,NAD_S
       ,NAD_R
       ,"UNS+D'"
