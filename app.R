@@ -53,7 +53,7 @@ ui <- fixedPage(
     sidebarLayout(
       #position = "right"
       #, fluid = FALSE,
-                  
+  
         sidebarPanel(width = 3,
 
 # energy type -------------------------------------------------------------
@@ -152,7 +152,7 @@ ui <- fixedPage(
 # Action button (generate output) -----------------------------------------
     
         fluidRow(
-            
+
             # todo: change class of columns from 'col sm-6' to 'col 6'
             column(
                 width = 6,
@@ -165,7 +165,7 @@ ui <- fixedPage(
             column(
                 width = 6,
                 align = "right",
-                
+
                 # UI outputs for the copy-to-clipboard buttons
                 actionButton(
                     "copyToClipboard"
@@ -179,8 +179,16 @@ ui <- fixedPage(
                         ,arrow = TRUE
                         ,animation = "scale-subtle"
                         ,duration = "[500,0]"
-                        ),
+                        )
                 )
+            ),
+          tags$hr(),
+          tags$small(
+            tags$div(
+              tags$p("Spotted something or have an improvement to suggest?", 
+              tags$a("Open an issue", href = "https://github.com/flrd/loadCurves/issues", target="_blank")
+              ),
+              )
             )
 ),
 
@@ -190,7 +198,7 @@ ui <- fixedPage(
             # make the text output editable
             htmltools::tagAppendAttributes(contenteditable="true")
           )
-    )
+)
 )
 
 # Define server logic required to draw a histogram
