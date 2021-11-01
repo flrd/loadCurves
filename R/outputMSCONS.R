@@ -8,32 +8,28 @@ msconsOutput <- function(
   ,energyType
   ) {
   
-  # we extract the first and last values from the 
+  # we extract the first and last values from the time sequence
   periodStart <- timeSeries[1L]
   periodEnd <- timeSeries[length(timeSeries)]
   
-  # UNT is the number of segment from UNH to UNT (both included)
+  # UNT is the number of segment from segments UNH to UNT (both included)
   UNT <- 13L + pmax(1L, length(timeSeries) - 1L) * 3 + 1L
   
-  
-  
-  # here we check for structure of the register
-  # For OBIS-Code, see page 5/27 in:
-  # https://www.edi-energy.de/index.php?id=38&tx_bdew_bdew%5Buid%5D=838&tx_bdew_bdew%5Baction%5D=download&tx_bdew_bdew%5Bcontroller%5D=Dokument&cHash=a7a251b9c22a4b3fa581f0717736a8ef
-  # example: 1-1:1.29.0
   PIA <- PIAsegment(register)
   
   # if user did not provide input, then add a {{Placeholder}}
   UNB <- UNB_NADsegments(sender, receiver, energyType)[["UNB"]]
   
   NADsegments <- UNB_NADsegments(sender, receiver, energyType)
-  NAD_S <- NADsegments[["NAD_S"]]
-  NAD_R <- NADsegments[["NAD_R"]]
+  NAD_Sender <- NADsegments[["NAD_Sender"]]
+  NAD_Receiver <- NADsegments[["NAD_Receiver"]]
   LOC <- LOCsegment(marketLocation)
   
   RFF <- RFFsegment(energyType)
   
-  # here comes single the pieces
+
+# build the MSCONS output -------------------------------------------------
+
   writeLines(
     c(
       "UNA:+.? '"
@@ -42,8 +38,8 @@ msconsOutput <- function(
       ,"BGM+7+04372109171600149903913000003056310+9'"
       ,"DTM+137:202103171500:203'"
       ,RFF
-      ,NAD_S
-      ,NAD_R
+      ,NAD_Sender
+      ,NAD_Receiver
       ,"UNS+D'"
       ,"NAD+DP'"
       ,LOC
@@ -53,7 +49,7 @@ msconsOutput <- function(
       ,PIA
       ,valuesMSCONS(
         timestamp = timeSeries,
-        quantity = round(pi, 4)
+        quantity = quantityRandom(n = length(timeSeries))
       )
       ,sprintf("UNT+%d+DCBKCICHBBCFBG'", UNT)
       ,"UNZ+1+DCBKCICHBBCECD'"
