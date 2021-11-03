@@ -43,7 +43,7 @@ ui <- fixedPage(
     shinyjs::useShinyjs(),
 
     # tippy 
-    use_tippy(),
+    # use_tippy(),
     
 
     # Application title
@@ -266,8 +266,8 @@ server <- function(input, output) {
 # gather input values to be used to create output formats -----------------
 
     # start and end date of the dateRange picker input
-    periodStart <- reactive(midnight(input$period[[1]]))
-    periodEnd <- reactive(midnight(input$period[[2]]))
+    periodStart <- reactive(format(input$period[[1]]), "%Y-%m-%d 00:00:00")
+    periodEnd <- reactive(format(input$period[[2]]), "%Y-%m-%d 00:00:00")
     
     # check the desired output
     desiredOutput <- reactive(input$outputFormat)
