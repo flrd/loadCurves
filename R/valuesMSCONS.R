@@ -8,8 +8,8 @@ valuesMSCONS <- function(timestamp, quantity) {
   
   # Map generates a list of length 3
   # the 1st element in the list will contain the values
-  # the 2st element in the list will contain the start of measurement
-  # the 3st element in the list will contain the end of measurement
+  # the 2st element in the list will contain the starts of measurement
+  # the 3st element in the list will contain the ends of measurement
   Map(sprintf,
       list(
         quantity = quantity

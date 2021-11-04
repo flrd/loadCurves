@@ -4,7 +4,6 @@ msconsOutput <- function(
   ,marketLocation
   ,register = NULL
   ,timeSeries
-  ,quantity
   ,energyType
   ) {
   
@@ -15,17 +14,24 @@ msconsOutput <- function(
   # UNT is the number of segment from segments UNH to UNT (both included)
   UNT <- 13L + pmax(1L, length(timeSeries) - 1L) * 3 + 1L
   
-  PIA <- PIAsegment(register)
+  
   
   # if user did not provide input, then add a {{Placeholder}}
   UNB <- UNB_NADsegments(sender, receiver, energyType)[["UNB"]]
+  
+  RFF <- RFFsegment(energyType)
   
   NADsegments <- UNB_NADsegments(sender, receiver, energyType)
   NAD_Sender <- NADsegments[["NAD_Sender"]]
   NAD_Receiver <- NADsegments[["NAD_Receiver"]]
   LOC <- LOCsegment(marketLocation)
   
-  RFF <- RFFsegment(energyType)
+  PIA <- PIAsegment(register)
+  
+  DTM_QTY <- valuesMSCONS(
+    timestamp = timeSeries,
+    quantity = quantityRandom(n = length(timeSeries))
+  )
   
 
 # build the MSCONS output -------------------------------------------------
@@ -47,10 +53,7 @@ msconsOutput <- function(
       ,sprintf("DTM+164:%s?+01:303'", periodEnd)
       ,"LIN+1'"
       ,PIA
-      ,valuesMSCONS(
-        timestamp = timeSeries,
-        quantity = quantityRandom(n = length(timeSeries))
-      )
+      ,DTM_QTY
       ,sprintf("UNT+%d+DCBKCICHBBCFBG'", UNT)
       ,"UNZ+1+DCBKCICHBBCECD'"
       )

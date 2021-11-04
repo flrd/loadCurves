@@ -10,7 +10,7 @@ validateOBIS <- function(register) {
 
 # RFF segment -------------------------------------------------------------
 
-RFFsegment <- function(energyType = c("Electricity", "Gas")) {
+RFFsegment <- function(energyType) {
   
   c(
     Electricity = "RFF+Z13:13018'"

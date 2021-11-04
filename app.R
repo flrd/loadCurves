@@ -70,9 +70,7 @@ ui <- fixedPage(
         selectInput(
             "outputFormat"
             ,label = "Output format"
-            ,choices = list(
-                "JSON"
-                ,"MSCONS"),
+            ,choices = c("JSON", "MSCONS"),
             selected = "JSON"
         ),
 
