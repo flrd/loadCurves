@@ -92,7 +92,7 @@ ui <- fixedPage(
 
         textInput(
             "marketPartnerNumber"
-            ,"Market partner"
+            ,"Market partner number"
         ),
 
 
@@ -207,7 +207,7 @@ server <- function(input, output) {
     # check for energy type
     elecTrue <- reactive({ input$energyType == "Electricity" })
     
-    # change the placeholder in the market location input
+    # change the placeholder in the text inputs
     # conditionally on the energy type
     observeEvent(input$energyType, {
 
@@ -266,14 +266,14 @@ server <- function(input, output) {
 # gather input values to be used to create output formats -----------------
 
     # start and end date of the dateRange picker input
-    periodStart <- reactive(format(input$period[[1]]), "%Y-%m-%d 00:00:00")
-    periodEnd <- reactive(format(input$period[[2]]), "%Y-%m-%d 00:00:00")
+    periodStart <- reactive( input$period[[1]] |> format("%Y-%m-%d 00:00:00") )
+    periodEnd <- reactive( input$period[[2]] |> format("%Y-%m-%d 00:00:00") )
     
     # check the desired output
     desiredOutput <- reactive(input$outputFormat)
     
     observe({
-        toggle("receiverInput", anim = TRUE, condition = desiredOutput() == "MSCONS")
+        shinyjs::toggle("receiverInput", anim = TRUE, condition = desiredOutput() == "MSCONS")
     })
     
 
@@ -355,7 +355,6 @@ server <- function(input, output) {
               ,by = input$interval
               ,msconsFormat = TRUE
               )
-            ,quantity = pi
             ,energyType = input$energyType
             )
           }
