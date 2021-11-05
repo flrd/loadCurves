@@ -18,7 +18,7 @@ interval <- function(from,
       seq.POSIXt(from = from,
                  to = to,
                  by = by) |>
-      format(format = "%Y-%m-%d 00:00:00")
+      format(format = "%Y-%m-%d %H:%M:%S")
   } else {
     outInterval <- 
       seq.POSIXt(from = from,
