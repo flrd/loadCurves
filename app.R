@@ -13,6 +13,7 @@ library(jsonlite)
 library(shinyjs)
 library(bslib)
 library(tippy)
+library(uuid)
 
 # get today's date
 today <- Sys.Date()
@@ -144,6 +145,18 @@ ui <- fixedPage(
                   "60 minutes" = "hour",
                   "1 day" = "day"),
             selected = "hour"),
+
+
+# total consumption -------------------------------------------------------
+
+        numericInput(
+          "totalConsumption"
+          ,"Total consumption"
+          ,value = 10
+          , min = 1
+          , max = 99999L
+          , step = 1
+          ),
 
 
 
@@ -331,7 +344,7 @@ server <- function(input, output) {
           )
           
           channelInformation <- channelInformation(
-            messageReference = messageReference()
+            messageReference = uuid::UUIDgenerate()
             ,sender = input$marketPartnerNumber
           )
           
