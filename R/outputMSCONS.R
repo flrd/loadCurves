@@ -4,6 +4,7 @@ msconsOutput <- function(
   ,marketLocation
   ,register = NULL
   ,timeSeries
+  ,totalConsumption
   ,energyType
   ) {
   
@@ -30,7 +31,9 @@ msconsOutput <- function(
   
   DTM_QTY <- valuesMSCONS(
     timestamp = timeSeries,
-    quantity = quantityRandom(n = length(timeSeries))
+    quantity = quantityRandom(
+      n = length(timeSeries)
+      ,totalConsumption = totalConsumption)
   )
   
 

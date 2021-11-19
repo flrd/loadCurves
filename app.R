@@ -26,6 +26,9 @@ ui <- fixedPage(
     # include script to enable copy to clipboard functionality
     tags$head(tags$script(src = "js/copy.js")),
     
+    # include css file
+    # tags$head(tags$script(src = "css/sidebar.css")),
+    
     # styling of the app using bslib package: 
     # https://cran.r-project.org/web/packages/bslib/index.html
     theme = bslib::bs_theme(version = 5,
@@ -53,7 +56,7 @@ ui <- fixedPage(
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
       #position = "right"
-      #, fluid = FALSE,
+      # fluid = FALSE,
   
         sidebarPanel(width = 3,
 
@@ -149,15 +152,25 @@ ui <- fixedPage(
 
 # total consumption -------------------------------------------------------
 
-        numericInput(
-          "totalConsumption"
-          ,"Total consumption"
-          ,value = 10
-          , min = 1
-          , max = 99999L
-          , step = 1
+        tags$div(
+          class="form-group shiny-input-container"
+          ,tags$label(
+            class="control-label"
+            ,id="-label"
+            ,`for`="totalConsumption"
+            , "Total consumption (optional)"
+          )
+          ,tags$input(
+            id = "totalConsumption"
+            ,type = "number"
+            ,class = "form-control"
+            ,value = NA_integer_
+            ,placeholder = "0 — 999999"
+            ,min = 0
+            ,max = 999999
+            ,step = 1
+            )
           ),
-
 
 
 # Action button (generate output) -----------------------------------------
@@ -209,7 +222,8 @@ ui <- fixedPage(
             # make the text output editable
             htmltools::tagAppendAttributes(contenteditable="true")
           )
-)
+
+  )
 )
 
 # Define server logic required to draw a histogram
@@ -319,7 +333,7 @@ server <- function(input, output) {
           timestamp = timeSequenceJSON()
           ,quantity = quantityRandom(
             n = length(timeSequenceJSON())
-            # ,missingValues = input$missingValues
+            ,totalConsumption = input$totalConsumption
           )
         )
       )
@@ -344,7 +358,10 @@ server <- function(input, output) {
           )
           
           channelInformation <- channelInformation(
-            messageReference = uuid::UUIDgenerate()
+            
+            # generate a UUID, but trim it to length 32 which is maximum length
+            # accepted by the API endpoint
+            messageReference = uuid::UUIDgenerate() |> strtrim(width = 32)
             ,sender = input$marketPartnerNumber
           )
           
@@ -366,6 +383,7 @@ server <- function(input, output) {
               ,by = input$interval
               ,msconsFormat = TRUE
               )
+            ,totalConsumption = input$totalConsumption
             ,energyType = input$energyType
             )
           }
