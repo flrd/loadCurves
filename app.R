@@ -27,7 +27,12 @@ ui <- fixedPage(
     tags$head(tags$script(src = "js/copy.js")),
     
     # include css file
-    # tags$head(tags$script(src = "css/sidebar.css")),
+    # tags$head(
+    #   tags$link(rel = "stylesheet"
+    #             ,type = "text/css"
+    #             ,tags$script(href = "css/sidebar.css"))
+    # ),
+    includeCSS("www/css/sidebar.css"),
     
     # styling of the app using bslib package: 
     # https://cran.r-project.org/web/packages/bslib/index.html
