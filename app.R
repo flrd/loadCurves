@@ -12,7 +12,6 @@ library(shiny)
 library(jsonlite)
 library(shinyjs)
 library(bslib)
-library(tippy)
 library(uuid)
 
 # get today's date
@@ -32,7 +31,7 @@ ui <- fixedPage(
     #             ,type = "text/css"
     #             ,tags$script(href = "css/sidebar.css"))
     # ),
-    includeCSS("www/css/sidebar.css"),
+    # includeCSS("www/css/sidebar.css"),
     
     # styling of the app using bslib package: 
     # https://cran.r-project.org/web/packages/bslib/index.html
@@ -42,7 +41,7 @@ ui <- fixedPage(
                             base_font = font_google("Lato"),
                             primary = "#6200E9",
                             success = "#00BD9A",
-                            info = "#4186E0", 
+                            info = "#4186E0",
                             warning = "#FDB700",
                             danger = "#F9491B",
                             font_scale = 0.9, 
@@ -163,57 +162,38 @@ ui <- fixedPage(
             class="control-label"
             ,id="-label"
             ,`for`="totalConsumption"
-            , "Total consumption (optional)"
+            , "Total consumption"
           )
           ,tags$input(
             id = "totalConsumption"
             ,type = "number"
             ,class = "form-control"
             ,value = NA_integer_
-            ,placeholder = "0 — 999999"
+            ,placeholder = "0 — 999999 (optional)"
             ,min = 0
             ,max = 999999
             ,step = 1
             )
-          ),
+          )
 
 
 # Action button (generate output) -----------------------------------------
-    
-        fluidRow(
 
-            # todo: change class of columns from 'col sm-6' to 'col 6'
-            column(
-                width = 6,
-                actionButton(
-                    "generate"
-                    ,"Generate"
-                    ,class = "btn-primary"
-                    )
-                ),
-            column(
-                width = 6,
-                align = "right",
-
-                # UI outputs for the copy-to-clipboard buttons
-                actionButton(
-                    "copyToClipboard"
-                    ,label = icon("clipboard")
-                    ,class = "btn btn-outline-dark"
-                    ) |>
-                    # adds tooltip from tippy pac
-                    with_tippy(
-                        "Copy to clipboard"
-                        ,placement = "right"
-                        ,arrow = TRUE
-                        ,animation = "scale-subtle"
-                        ,duration = "[500,0]"
-                        )
-                )
-            ),
-          tags$hr(),
-          tags$small(
-            tags$div(
+        ,div(
+          class="d-grid gap-2 pt-3"
+          ,actionButton(
+            "generate"
+            ,"Generate"
+            ,class = "btn-primary fw-normal fs-6"
+            )
+          ,actionButton(
+            "copyToClipboard"
+            ,label = "Copy to clipboard"
+            ,class = "btn-secondary fw-normal fs-6"
+            )
+          )
+          ,tags$small(class = "p-2"
+            ,tags$div(
               tags$p("Spotted something or have an improvement to suggest?", 
               tags$a("Open an issue", href = "https://github.com/flrd/loadCurves/issues", target="_blank")
               ),
