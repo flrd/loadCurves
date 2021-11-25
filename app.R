@@ -24,13 +24,7 @@ ui <- fixedPage(
     
     # include script to enable copy to clipboard functionality
     tags$head(tags$script(src = "js/copy.js")),
-    
-    # include css file
-    # tags$head(
-    #   tags$link(rel = "stylesheet"
-    #             ,type = "text/css"
-    #             ,tags$script(href = "css/sidebar.css"))
-    # ),
+
     # includeCSS("www/css/sidebar.css"),
     
     # styling of the app using bslib package: 
@@ -50,136 +44,168 @@ ui <- fixedPage(
     # Set up shinyjs
     shinyjs::useShinyjs(),
 
-    # tippy 
-    # use_tippy(),
-    
-
     # Application title
     titlePanel("Generate a load curve"),
 
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
-      #position = "right"
+      # position = "right"
       # fluid = FALSE,
   
         sidebarPanel(width = 3,
 
 # energy type -------------------------------------------------------------
 
-        selectInput(
-            "energyType"
-            ,"Contract type"
-            ,choices = c("Electricity", "Gas")
-            ,selected = "Electricity"
+        tags$div(
+          class = "row"
+          ,tags$label(
+            class = "col-sm-5 col-form-label"
+            ,"Energy type"
+            ,`for`= "energyType"
+          )
+          ,tags$div(
+            class = "col-sm-7"
+            ,selectInput(
+              inputId = "energyType"
+              ,label = NULL
+              ,choices = c("Electricity", "Gas")
+              ,selected = "Electricity"
+            )
+          )
         ),
+
 
 # desired output ----------------------------------------------------------
 
-        selectInput(
-            "outputFormat"
-            ,label = "Output format"
-            ,choices = c("JSON", "MSCONS"),
-            selected = "JSON"
+        tags$div(
+          class = "row"
+          ,tags$label(
+            class = "col-sm-5 col-form-label"
+            ,"Output"
+            ,`for`= "outputFormat"
+          )
+          ,tags$div(
+            class = "col-sm-7"
+            ,selectInput(
+              inputId = "outputFormat"
+              ,label = NULL
+              ,choices = c("JSON", "MSCONS")
+              ,selected = "JSON"
+            )
+          )
         ),
-
-        tags$hr(),
-
-
-# location (MaLo / MeLo) --------------------------------------------------
-
-# input validation: https://rstudio.github.io/shinyvalidate/
-        textInput(
-            "marketLocation"
-            ,"Location"
-        ),
-
-
-# market part (Strom: MSB, Gas: Netzbetreiber) --------------------------------------------------
-
-        textInput(
-            "marketPartnerNumber"
-            ,"Market partner number"
-        ),
-
-
-# Register --------------------------------------------------
-        
-        textInput(
-            "register"
-            ,"Register"
-            ,placeholder = "e.g. 1-1:1.29.0"
-            ),
-
-
-# Receiver, only needed when MSCONS format is desired ---------------------
-
-        div(
-            id = "receiverInput",
-            textInput(
-                "receiver"
-                ,"Receiver"
-                )
-            ) |>
-        # CSS to hide the element by default
-        htmltools::tagAppendAttributes(
-            style = "display:none"),
-
-            tags$hr(),
-
-
-# Period ------------------------------------------------------------------
-
-        dateRangeInput(
-            inputId = "period"
-            ,"Period"
-            ,start = today - 1L
-            ,end = today
-            ,separator = "to"
-            ,format = "yyyy, M d"
-            ),
 
 
 # Interval ----------------------------------------------------------------
 
-        selectInput(
-            "interval",
-            "Interval",
-            choices =
+        tags$div(
+          class = "row"
+          ,tags$label(
+            class = "col-sm-5 col-form-label"
+            ,"Interval"
+            ,`for`= "interval"
+          )
+          ,tags$div(
+            class = "col-sm-7"
+            ,selectInput(
+              "interval",
+              label = NULL,
+              choices =
                 list(
                   "5 minutes" = "5 mins",
                   "15 minutes" = "15 mins",
                   "30 minutes" = "30 mins",
                   "60 minutes" = "hour",
                   "1 day" = "day"),
-            selected = "hour"),
+              selected = "hour")
+          )
+        ),
 
 
 # total consumption -------------------------------------------------------
 
         tags$div(
-          class="form-group shiny-input-container"
+          class = "row"
           ,tags$label(
-            class="control-label"
-            ,id="-label"
-            ,`for`="totalConsumption"
-            , "Total consumption"
+            class = "col-sm-5 col-form-label"
+            ,"Quantity"
+            ,`for`= "totalConsumption"
           )
-          ,tags$input(
-            id = "totalConsumption"
-            ,type = "number"
-            ,class = "form-control"
-            ,value = NA_integer_
-            ,placeholder = "0 — 999999 (optional)"
-            ,min = 0
-            ,max = 999999
-            ,step = 1
+          ,tags$div(
+            class = "col-sm-7"
+            ,tags$div(
+              class="form-group shiny-input-container"
+              ,tags$input(
+                id = "totalConsumption"
+                ,type = "number"
+                ,class = "form-control"
+                ,value = NA_integer_
+                ,placeholder = "0 — 999999.99"
+                ,min = 0
+                ,max = 999999
+                ,step = 1
+              )
             )
           )
+        ),
+
+
+# Period ------------------------------------------------------------------
+
+        dateRangeInput(
+          inputId = "period"
+          ,"Period"
+          ,start = today - 1L
+          ,end = today
+          ,separator = "to"
+          ,format = "yyyy, M d"
+        ),
+
+
+# location (MaLo / MeLo) --------------------------------------------------
+
+        textInput(
+          "marketLocation"
+          ,"Location"
+        ),
+
+
+# market part (Strom: MSB, Gas: Netzbetreiber) --------------------------------------------------
+
+        textInput(
+          "marketPartnerNumber"
+          ,"Market partner number"
+        ),
+
+
+# Register --------------------------------------------------
+
+        textInput(
+          "register"
+          ,"Register"
+          ,placeholder = "e.g. 1-1:1.29.0"
+        ),
+
+
+# Receiver, only needed when MSCONS format is desired ---------------------
+
+        div(
+          id = "receiverInput",
+          textInput(
+            "receiver"
+            ,"Receiver"
+          )
+        ) |>
+          # CSS to hide the element by default
+          htmltools::tagAppendAttributes(
+            style = "display:none"),
+
+
 
 
 # Action button (generate output) -----------------------------------------
 
-        ,div(
+        div(
           class="d-grid gap-2 pt-3"
           ,actionButton(
             "generate"
@@ -192,6 +218,8 @@ ui <- fixedPage(
             ,class = "btn-secondary fw-normal fs-6"
             )
           )
+
+
           ,tags$small(class = "p-2"
             ,tags$div(
               tags$p("Spotted something or have an improvement to suggest?", 
