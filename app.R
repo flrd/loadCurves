@@ -22,8 +22,12 @@ today <- Sys.Date()
 # Define UI for application that draws a histogram
 ui <- fixedPage(
     
-    # include script to enable copy to clipboard functionality
-    tags$head(tags$script(src = "js/copy.js")),
+    # include scripts to 
+    # enable copy to clipboard functionality
+    # trim white spaces from text inputs
+    tags$head(
+      tags$script(src = "js/copy.js"),
+      tags$script(src = "js/trim.js")),
 
     # includeCSS("www/css/sidebar.css"),
     
@@ -365,22 +369,35 @@ server <- function(input, output, server) {
       
     
       loadCurves <- reactive({
-        sprintf(
-          '{"marketPartnerNumber":"%s","register":"%s","energyType":%d,"valueInterval":%d,"locationNumber":"%s","locationType":%d,"createdBy":"string",'
-          ,input$marketPartnerNumber, input$register, energyType(), valueInterval(), input$marketLocation, locationType()
-          )})
+        
+        loadCurves_fun(
+          marketPartnerNumber = input$marketPartnerNumber
+          ,register = input$register
+          ,energyType = energyType()
+          ,valueInterval = valueInterval()
+          ,marketLocation = input$marketLocation
+          ,locationType = locationType()
+          )
+        })
 
       loadCurveSets <- reactive({
-        sprintf(
-          '{"channel":1,"periodStart":"%s","periodEnd":"%s","quality":1,"createdBy":"string",'
-          ,format(input$period[[1]], "%Y-%m-%d 00:00:00"), format(input$period[[2]], "%Y-%m-%d 00:00:00")
-          )})
+        
+        loadCurveSets_fun(
+          periodStart = input$period[[1]]
+          ,periodEnd = input$period[[2]]
+        )
+      })
+
 
       channelInformation <- reactive({
-        sprintf(
-          '{"messageReference":"%s","sender":"%s","messageDateTime":"%s"}',
-          uuid::UUIDgenerate() |> strtrim(width = 32), input$marketPartnerNumber, Sys.time()
-          )})
+        
+        channelInformation_fun(
+          messageReference = strtrim(uuid::UUIDgenerate(), width = 32)
+          ,sender = input$marketPartnerNumber
+          ,messageDateTime = Sys.time()
+        )
+      })
+
       
       qty <- reactive({
         paste(
@@ -390,10 +407,6 @@ server <- function(input, output, server) {
         )
       })
 
-      # jsonMinified <- reactive({
-      #   sprintf('{"loadCurves":[%s"loadCurveSets":[%s"channelInformation":%s,"values":[%s]}]}]}'
-      #           ,loadCurves(), loadCurveSets(), channelInformation(), qty())
-      #   })
       
       jsonMinified <- reactive({
         JSON(
@@ -406,7 +419,8 @@ server <- function(input, output, server) {
       
       jsonPrettified <- reactive({
         jsonMinified() |> jsonlite::prettify(indent = 2)
-      })
+      }) |>
+        bindEvent(input$generate)
     
     
       # calculate the DTM_QTY segments for MSCONS output

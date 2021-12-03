@@ -1,11 +1,17 @@
-# loadCurves <- function(marketPartnerNumber, register, energyType, valueInterval, locationNumber, locationType, createdBy) {
-#   data.frame(
-#     marketPartnerNumber = marketPartnerNumber,
-#     register = register,
-#     energyType = energyType,
-#     valueInterval = valueInterval,
-#     locationNumber = locationNumber,
-#     locationType = locationType,
-#     createdBy = "string"
-#   )
-# }
+loadCurves_fun <-
+  function(marketPartnerNumber,
+           register,
+           energyType,
+           valueInterval,
+           marketLocation,
+           locationType) {
+    sprintf(
+      '{"marketPartnerNumber":"%s","register":"%s","energyType":%d,"valueInterval":%d,"locationNumber":"%s","locationType":%d,"createdBy":"string",'
+      ,marketPartnerNumber
+      ,register
+      ,energyType
+      ,valueInterval
+      ,marketLocation
+      ,locationType
+    )
+  }
