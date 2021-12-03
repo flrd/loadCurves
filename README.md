@@ -1,6 +1,6 @@
 ## loadCurves
 
-A tool that help to create load curves. Supported are MSCONS messages to be used by the Edifact App and JSON output for the API end point `/load_curves/batch`
+A tool that helps to create load curves to be used in [powercloud](https://power.cloud/). It is possible to generate MSCONS format and JSON format. The first format to be used by the Edifact App and latter for the API end point `/load_curves/batch`, see documentation below.
 
 Live version available under [flrd.shinyapps.io/loadcurves/](https://flrd.shinyapps.io/loadcurves/)
 
