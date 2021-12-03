@@ -36,7 +36,7 @@ ui <- fixedPage(
                             primary = "#6200E9",
                             success = "#00BD9A",
                             info = "#4186E0",
-                            warning = "#FDB700",
+                            warning = "#11A859",
                             danger = "#F9491B",
                             font_scale = 0.9, 
                             spacer = ".7rem"),
@@ -45,7 +45,7 @@ ui <- fixedPage(
     shinyjs::useShinyjs(),
 
     # Application title
-    titlePanel("Generate a load curve"),
+    tags$h2("Generate a load curve", class = "display-6 pb-3"),
 
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
@@ -227,7 +227,7 @@ ui <- fixedPage(
               ),
               )
             )
-),
+        ),
 
 
         mainPanel(width = 9,
@@ -235,25 +235,80 @@ ui <- fixedPage(
             # make the text output editable
             htmltools::tagAppendAttributes(contenteditable="true")
           )
-
-  )
+    )
 )
 
 # Define server logic required to draw a histogram
-server <- function(input, output) {
+server <- function(input, output, server) {
+  
+    # dateRange input returns date class, here we make it date-time class
+    periodStart <- reactive({ as.POSIXlt(input$period[[1]]) })
+    periodEnd <- reactive({ as.POSIXlt(input$period[[2]]) })
     
-    # check for energy type
+    # energyType equals 1 for elec, 2 for gas, same for locationType
+    energyType <- locationType <- reactive({ if(elecTrue()) 1L else 2L })
+    
+    
+    # based on the specified interval, calculate its duration in minutes
+    valueInterval <- reactive({ 
+      switch(
+        EXPR = input$interval,
+        "5 mins" = 5L,
+        "15 mins" = 15L,
+        "30 mins" = 30L,
+        "hour" = 60L,
+        "day" = 1440L
+      )
+    })
+    
+    
+    # based on start date, end date and interval, generate a time sequence
+    # starting at periodStart to periodEnd
+    timeSequence <- reactive({
+      interval(
+        from = periodStart()
+        ,to = periodEnd()
+        ,by = input$interval
+      )
+    })
+    
+    
+    # get the length of the time sequence
+    n <- reactive({ length(timeSequence()) })
+    
+    
+    # date-times based on desired output format in JSON object
+    timeSequenceJSON <- reactive({ format(timeSequence(), format = "%Y-%m-%d %H:%M:%S") })
+    
+    
+    # for MSCONS we need 2 time sequences:
+    # 1st for the start of measurement, 2nd for end of period
+    # end of period equals start + selected interval
+    # because POSIXt calculates in seconds, we multiply interval * 60 (seconds)
+    timeSequenceStartMSCONS <- reactive({ format(timeSequence()[-n()], format = "%Y%m%d%H%M") })
+    timeSequenceEndMSCONS <- reactive({ format(timeSequence()[-1], format = "%Y%m%d%H%M") })
+    
+    
+    # calculate quantities
+    quantity <- reactive({
+      
+      list(
+        "JSON" = values(n = n(), totalConsumption = input$totalConsumption),
+        "MSCONS" = values(n = n() - 1, totalConsumption = input$totalConsumption)
+        )
+      })
+    
+    
+    # check for energy type: TRUE for electricity, FALSE for gas
     elecTrue <- reactive({ input$energyType == "Electricity" })
+    
     
     # change the placeholder in the text inputs
     # conditionally on the energy type
     observeEvent(input$energyType, {
 
-        # # change the placeholder for:
-        # market location
-        # market partner
-        # market partner
-        # register"
+        # change the placeholder for:
+        # market location, market partner, receiver, register
         
         Map(f = placeholder
             ,inputId = list("marketLocation"
@@ -263,19 +318,18 @@ server <- function(input, output) {
             ,condition = elecTrue()
             
             # to be shown for electricity contracts
-            ,valueTRUE = list("Market location"
+            ,valuesElec = list("Market location"
                               ,"Metering point operator"
                               ,"BDEW / ILN number"
                               ,"e.g. 1-1:1.29.0")
             
             # to be shown for gas contracts
-            ,valueFALSE = list("Meter location"
+            ,valuesGas = list("Meter location"
                                ,"Grid operator"
                                ,"VDEW / ILN number"
                                ,"e.g. 7-1:3.1.0")
-        )
-        }
-    )
+            )
+      })
     
     # show a notification when copy button was clicked
     observeEvent(input$copyToClipboard, {
@@ -283,7 +337,7 @@ server <- function(input, output) {
         "Output copied!",
         closeButton = FALSE,
         duration = 2.5,
-        type = "default"
+        type = "warning" 
       )
     })
     
@@ -301,108 +355,96 @@ server <- function(input, output) {
     # https://shiny.rstudio.com/articles/notifications.html
 
 
-# gather input values to be used to create output formats -----------------
-
-    # start and end date of the dateRange picker input
-    periodStart <- reactive( input$period[[1]] |> format("%Y-%m-%d 00:00:00") )
-    periodEnd <- reactive( input$period[[2]] |> format("%Y-%m-%d 00:00:00") )
-    
-    # check the desired output
-    desiredOutput <- reactive(input$outputFormat)
-    
+    # if desired output is MSCONS, show receiverInput element
     observe({
-        shinyjs::toggle("receiverInput", anim = TRUE, condition = desiredOutput() == "MSCONS")
+        shinyjs::toggle("receiverInput", anim = TRUE, condition = input$outputFormat == "MSCONS")
     })
     
 
 # generate data structure to be converted to JSON -------------------------
+      
     
-    
-      energyType <- reactive({ ifelse(elecTrue(), 1L, 2L) })
-      valueInterval <- reactive({ 
-        switch(
-          EXPR = input$interval,
-          "5 mins" = 5L,
-          "15 mins" = 15L,
-          "30 mins" = 30L,
-          "hour" = 60L,
-          "day" = 1440L
+      loadCurves <- reactive({
+        sprintf(
+          '{"marketPartnerNumber":"%s","register":"%s","energyType":%d,"valueInterval":%d,"locationNumber":"%s","locationType":%d,"createdBy":"string",'
+          ,input$marketPartnerNumber, input$register, energyType(), valueInterval(), input$marketLocation, locationType()
+          )})
+
+      loadCurveSets <- reactive({
+        sprintf(
+          '{"channel":1,"periodStart":"%s","periodEnd":"%s","quality":1,"createdBy":"string",'
+          ,format(input$period[[1]], "%Y-%m-%d 00:00:00"), format(input$period[[2]], "%Y-%m-%d 00:00:00")
+          )})
+
+      channelInformation <- reactive({
+        sprintf(
+          '{"messageReference":"%s","sender":"%s","messageDateTime":"%s"}',
+          uuid::UUIDgenerate() |> strtrim(width = 32), input$marketPartnerNumber, Sys.time()
+          )})
+      
+      qty <- reactive({
+        paste(
+          sprintf('{"timestamp":"%s","quantity":"%s","quality":1,"createdBy":"string"}'
+                  , timeSequenceJSON(), quantity()[["JSON"]]),
+          collapse = ","
+        )
+      })
+
+      # jsonMinified <- reactive({
+      #   sprintf('{"loadCurves":[%s"loadCurveSets":[%s"channelInformation":%s,"values":[%s]}]}]}'
+      #           ,loadCurves(), loadCurveSets(), channelInformation(), qty())
+      #   })
+      
+      jsonMinified <- reactive({
+        JSON(
+          loadCurves = loadCurves()
+          ,loadCurveSets = loadCurveSets()
+          ,channelInformation = channelInformation()
+          ,values = qty()
         )
       })
       
-      # based on the user specified interval, generate a time sequence
-      # starting at periodStart to periodEnd
-      timeSequenceJSON <- reactive({
-        interval(
-          from = periodStart()
-          ,to = periodEnd()
-          ,by = input$interval
-          ,msconsFormat = FALSE 
-        )
+      jsonPrettified <- reactive({
+        jsonMinified() |> jsonlite::prettify(indent = 2)
       })
-      
-      timeSeries <- reactive(
-        valuesJSON(
-          timestamp = timeSequenceJSON()
-          ,quantity = quantityRandom(
-            n = length(timeSequenceJSON())
-            ,totalConsumption = input$totalConsumption
+    
+    
+      # calculate the DTM_QTY segments for MSCONS output
+      # there will be n - 1 values in the end
+      DTM_QTY <- reactive({
+        valuesMSCONS(
+          intervalStarts = timeSequenceStartMSCONS()
+          ,intervalEnds = timeSequenceEndMSCONS()
+          ,quantity = quantity()[["MSCONS"]]
           )
-        )
-      )
+      })
+      
       
       outputMessage <- eventReactive(input$generate, ignoreInit = TRUE, {
         
         if(input$outputFormat == "JSON") {
           
-          loadCurves <- loadCurves(
-            marketPartnerNumber = input$marketPartnerNumber,
-            register = input$register,
-            energyType = energyType(),
-            valueInterval = valueInterval(),
-            locationNumber = input$marketLocation,
-            locationType = energyType()
-          )
-          
-          # put all the pieces together, convert to JSON
-          loadCurveSets <- loadCurveSets(
-            periodStart = periodStart()
-            ,periodEnd = periodEnd()
-          )
-          
-          channelInformation <- channelInformation(
-            
-            # generate a UUID, but trim it to length 32 which is maximum length
-            # accepted by the API endpoint
-            messageReference = uuid::UUIDgenerate() |> strtrim(width = 32)
-            ,sender = input$marketPartnerNumber
-          )
-          
-          loadCurveSets[[1]][["channelInformation"]] <- I(channelInformation)
-          loadCurveSets[[1]][["values"]] <- list(timeSeries())
-          loadCurves[["loadCurveSets"]] <- loadCurveSets
-          
-          return(toJSON(list("loadCurves" = loadCurves), pretty = TRUE))
+          jsonPrettified()
         
           } else {
-          msconsOutput(
+          MSCONS(
             sender = input$marketPartnerNumber
             ,receiver = input$receiver
             ,marketLocation = input$marketLocation
             ,register = input$register
-            ,timeSeries = interval(
-              from = periodStart()
-              ,to = periodEnd()
-              ,by = input$interval
-              ,msconsFormat = TRUE
-              )
+            ,periodStart = periodStart()
+            ,periodEnd = periodEnd()
+            ,DTM_QTY = DTM_QTY()
+            ,n = n()
             ,totalConsumption = input$totalConsumption
             ,energyType = input$energyType
             )
           }
-        })      
-
-    output$outputMessage <- renderPrint(outputMessage())
+        
+        
+        })
+      
+      output$outputMessage <- renderPrint(outputMessage())
     
 }
 
