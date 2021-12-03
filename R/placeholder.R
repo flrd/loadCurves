@@ -1,5 +1,5 @@
-placeholder <- function(inputId, condition, valueTRUE, valueFALSE) {
+placeholder <- function(inputId, condition, valuesElec, valuesGas) {
   updateTextInput(inputId = inputId,
-                  placeholder = ifelse(condition, valueTRUE, valueFALSE))
+                  placeholder = if(condition) valuesElec else valuesGas)
 }
 

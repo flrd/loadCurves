@@ -1,21 +1,22 @@
-msconsOutput <- function(
+MSCONS <- function(
   sender
   ,receiver
   ,marketLocation
   ,register = NULL
-  ,timeSeries
+  ,periodStart
+  ,periodEnd
+  ,n
+  ,DTM_QTY
   ,totalConsumption
   ,energyType
   ) {
   
-  # we extract the first and last values from the time sequence
-  periodStart <- timeSeries[1L]
-  periodEnd <- timeSeries[length(timeSeries)]
+
+  periodStart <- format(periodStart, format = "%Y%m%d%H%M")
+  periodEnd <- format(periodEnd, format = "%Y%m%d%H%M")
   
   # UNT is the number of segment from segments UNH to UNT (both included)
-  UNT <- 13L + pmax(1L, length(timeSeries) - 1L) * 3 + 1L
-  
-  
+  UNT <- 13L + pmax(1L, n - 1L) * 3 + 1L
   
   # if user did not provide input, then add a {{Placeholder}}
   UNB <- UNB_NADsegments(sender, receiver, energyType)[["UNB"]]
@@ -28,13 +29,6 @@ msconsOutput <- function(
   LOC <- LOCsegment(marketLocation)
   
   PIA <- PIAsegment(register)
-  
-  DTM_QTY <- valuesMSCONS(
-    timestamp = timeSeries,
-    quantity = quantityRandom(
-      n = length(timeSeries)
-      ,totalConsumption = totalConsumption)
-  )
   
 
 # build the MSCONS output -------------------------------------------------

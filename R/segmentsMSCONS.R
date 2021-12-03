@@ -12,10 +12,11 @@ validateOBIS <- function(register) {
 
 RFFsegment <- function(energyType) {
   
-  c(
-    Electricity = "RFF+Z13:13018'"
-    ,Gas = "RFF+Z13:13008'"
-  )[[energyType]]
+  if (energyType == "Electricity") {
+    return("RFF+Z13:13018'")
+  } else {
+    return("RFF+Z13:13008'")
+  }
   
 }
 
@@ -25,6 +26,11 @@ RFFsegment <- function(energyType) {
 PIAsegment <- function(register) {
   
   if(validateOBIS(register)) {
+    
+    # when the users supplies a valid OBIS code, 
+    # return it with ? added before colon
+    # 1-1:1.29.0 --> 1-1?:1.29.0
+    # else return register as supplied by user
     tmp <- strsplit(register, split = ":") |> unlist()
     PIA <- sprintf("PIA+5+%s?:%s:SRW'", tmp[[1]], tmp[[2]])
     
@@ -76,7 +82,7 @@ UNB_NADsegments <- function(sender, receiver, energyType) {
     ,"Gas" = 332
   )[[energyType]]
   
-  # the pattern %1$s reads as take the first values from the ... argument, %2$s the second, %3$d third
+  # the pattern %1$s reads as 'take the first values from the ... arguments, %2$s the second, %3$d third etc.'
   UNB <- sprintf("UNB+UNOC:3+%1$s:%3$d+%2$s:%3$d+210917:%3$d+DCBKCICHBBCECD++TL'", sender, receiver, UNB_value)
   NAD_Sender <- sprintf("NAD+MS+%s::%d'", sender, NAD_value)
   NAD_Receiver <- sprintf("NAD+MR+%s::%d'", receiver, NAD_value)
