@@ -1,3 +1,5 @@
 form.well {
-  width: 268px;
+  /* width: 268px; */
+  position: sticky;
+  top: 1rem;
 }
