@@ -13,6 +13,7 @@ library(jsonlite)
 library(shinyjs)
 library(bslib)
 library(uuid)
+library(shinyFeedback)
 
 # get today's date
 today <- Sys.Date()
@@ -29,7 +30,7 @@ ui <- fixedPage(
       tags$script(src = "js/copy.js"),
       tags$script(src = "js/trim.js")),
 
-    # includeCSS("www/css/sidebar.css"),
+    includeCSS("www/css/sidebar.css"),
     
     # styling of the app using bslib package: 
     # https://cran.r-project.org/web/packages/bslib/index.html
@@ -47,6 +48,9 @@ ui <- fixedPage(
 
     # Set up shinyjs
     shinyjs::useShinyjs(),
+    
+    # shiny input valdation
+    shinyFeedback::useShinyFeedback(),
 
     # Application title
     tags$h2("Generate a load curve", class = "display-6 pb-3"),
@@ -161,7 +165,7 @@ ui <- fixedPage(
           ,"Period"
           ,start = today - 1L
           ,end = today
-          ,separator = "to"
+          ,separator = "—"
           ,format = "yyyy, M d"
         ),
 
@@ -436,9 +440,18 @@ server <- function(input, output, server) {
       
       outputMessage <- eventReactive(input$generate, ignoreInit = TRUE, {
         
+        # don't do any computation if period end is before period start
+        validDateRange <- input$period[[1]] < input$period[[2]]
+        shinyFeedback::feedbackDanger(inputId = "period"
+                                      ,!validDateRange
+                                      ,"Start must be before end"
+                                      ,color = "#F24030"
+                                      ,icon = NULL)
+        req(validDateRange, cancelOutput = TRUE)
+        
         if(input$outputFormat == "JSON") {
           
-          jsonPrettified()
+          jsonPrettified() |> trimws()
         
           } else {
           MSCONS(
