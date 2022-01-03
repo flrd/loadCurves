@@ -60,7 +60,12 @@ ui <- fixedPage(
       # position = "right"
       # fluid = FALSE,
   
-        sidebarPanel(width = 3,
+        # sidebarPanel(width = 3,
+       tags$div(
+         class = "col-xs-12 col-sm-12 col-md-5 col-lg-4 col-xl-4 col-xxl-3",
+         tags$form(
+           class = "well",
+           role = "complementary",
 
 # energy type -------------------------------------------------------------
 
@@ -165,7 +170,7 @@ ui <- fixedPage(
           ,"Period"
           ,start = today - 1L
           ,end = today
-          ,separator = "—"
+          ,separator = "to"
           ,format = "yyyy, M d"
         ),
 
@@ -235,10 +240,13 @@ ui <- fixedPage(
               ),
               )
             )
-        ),
+)
+),
 
 
-        mainPanel(width = 9,
+        # mainPanel(width = 9,
+# "col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3"
+      tags$div(class = "col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-8 col-xxl-9", role="main",
           verbatimTextOutput("outputMessage") |>
             # make the text output editable
             htmltools::tagAppendAttributes(contenteditable="true")
@@ -448,7 +456,7 @@ server <- function(input, output, server) {
                                       ,color = "#F24030"
                                       ,icon = NULL)
         req(validDateRange, cancelOutput = TRUE)
-        
+
         if(input$outputFormat == "JSON") {
           
           jsonPrettified() |> trimws()
