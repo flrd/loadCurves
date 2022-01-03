@@ -22,105 +22,98 @@ today <- Sys.Date()
 
 # Define UI for application that draws a histogram
 ui <- fixedPage(
-    
-    # include scripts to 
-    # enable copy to clipboard functionality
-    # trim white spaces from text inputs
-    tags$head(
-      tags$script(src = "js/copy.js"),
-      tags$script(src = "js/trim.js")),
-
-    includeCSS("www/css/sidebar.css"),
-    
-    # styling of the app using bslib package: 
-    # https://cran.r-project.org/web/packages/bslib/index.html
-    theme = bslib::bs_theme(version = 5,
-                            bootswatch = "zephyr",
-                            code_font = font_google("Inconsolata"),
-                            base_font = font_google("Lato"),
-                            primary = "#6200E9",
-                            success = "#00BD9A",
-                            info = "#4186E0",
-                            warning = "#11A859",
-                            danger = "#F9491B",
-                            font_scale = 0.9, 
-                            spacer = ".7rem"),
-
-    # Set up shinyjs
-    shinyjs::useShinyjs(),
-    
-    # shiny input valdation
-    shinyFeedback::useShinyFeedback(),
-
-    # Application title
-    tags$h2("Generate a load curve", class = "display-6 pb-3"),
-
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-      # position = "right"
-      # fluid = FALSE,
+  # include scripts to
+  # enable copy to clipboard functionality
+  # trim white spaces from text inputs
+  tags$head(
+    tags$script(src = "js/copy.js"),
+    tags$script(src = "js/trim.js")
+  ),
   
-        # sidebarPanel(width = 3,
-       tags$div(
-         class = "col-xs-12 col-sm-12 col-md-5 col-lg-4 col-xl-4 col-xxl-3",
-         tags$form(
-           class = "well",
-           role = "complementary",
-
+  includeCSS("www/css/sidebar.css"),
+  
+  # styling of the app using bslib package:
+  # https://cran.r-project.org/web/packages/bslib/index.html
+  theme = bslib::bs_theme(
+    version = 5,
+    bootswatch = "zephyr",
+    code_font = font_google("Inconsolata"),
+    base_font = font_google("Lato"),
+    primary = "#6200E9",
+    success = "#00BD9A",
+    info = "#4186E0",
+    warning = "#11A859",
+    danger = "#F9491B",
+    font_scale = 0.9,
+    spacer = ".7rem"
+  ),
+  
+  # Set up shinyjs
+  shinyjs::useShinyjs(),
+  
+  # shiny input valdation
+  shinyFeedback::useShinyFeedback(),
+  
+  # Application title
+  tags$h2("Generate a load curve", class = "display-6 pb-3"),
+  
+  # Sidebar with a slider input for number of bins
+  sidebarLayout(
+    # sidebarPanel
+    tags$div(
+      class = "col-xs-12 col-sm-12 col-md-5 col-lg-4 col-xl-4 col-xxl-3",
+      tags$form(
+        class = "well",
+        role = "complementary",
+        
+        
 # energy type -------------------------------------------------------------
-
+        
         tags$div(
-          class = "row"
-          ,tags$label(
-            class = "col-sm-5 col-form-label"
-            ,"Energy type"
-            ,`for`= "energyType"
-          )
-          ,tags$div(
-            class = "col-sm-7"
-            ,selectInput(
-              inputId = "energyType"
-              ,label = NULL
-              ,choices = c("Electricity", "Gas")
-              ,selected = "Electricity"
+          class = "row",
+          tags$label(class = "col-sm-5 col-form-label",
+                     "Energy type",
+                     `for` = "energyType"),
+          tags$div(
+            class = "col-sm-7",
+            selectInput(
+              inputId = "energyType",
+              label = NULL,
+              choices = c("Electricity", "Gas"),
+              selected = "Electricity"
             )
           )
         ),
-
-
+        
+        
 # desired output ----------------------------------------------------------
-
+        
         tags$div(
-          class = "row"
-          ,tags$label(
-            class = "col-sm-5 col-form-label"
-            ,"Output"
-            ,`for`= "outputFormat"
-          )
-          ,tags$div(
-            class = "col-sm-7"
-            ,selectInput(
-              inputId = "outputFormat"
-              ,label = NULL
-              ,choices = c("JSON", "MSCONS")
-              ,selected = "JSON"
+          class = "row",
+          tags$label(class = "col-sm-5 col-form-label",
+                     "Output",
+                     `for` = "outputFormat"),
+          tags$div(
+            class = "col-sm-7",
+            selectInput(
+              inputId = "outputFormat",
+              label = NULL,
+              choices = c("JSON", "MSCONS"),
+              selected = "JSON"
             )
           )
         ),
-
-
+        
+        
 # Interval ----------------------------------------------------------------
-
+        
         tags$div(
-          class = "row"
-          ,tags$label(
-            class = "col-sm-5 col-form-label"
-            ,"Interval"
-            ,`for`= "interval"
-          )
-          ,tags$div(
-            class = "col-sm-7"
-            ,selectInput(
+          class = "row",
+          tags$label(class = "col-sm-5 col-form-label",
+                     "Interval", `for` = "interval"),
+          tags$div(
+            class = "col-sm-7",
+            selectInput(
               "interval",
               label = NULL,
               choices =
@@ -129,129 +122,114 @@ ui <- fixedPage(
                   "15 minutes" = "15 mins",
                   "30 minutes" = "30 mins",
                   "60 minutes" = "hour",
-                  "1 day" = "day"),
-              selected = "hour")
+                  "1 day" = "day"
+                ),
+              selected = "hour"
+            )
           )
         ),
-
-
+        
+        
 # total consumption -------------------------------------------------------
-
+        
         tags$div(
-          class = "row"
-          ,tags$label(
-            class = "col-sm-5 col-form-label"
-            ,"Quantity"
-            ,`for`= "totalConsumption"
-          )
-          ,tags$div(
-            class = "col-sm-7"
-            ,tags$div(
-              class="form-group shiny-input-container"
-              ,tags$input(
-                id = "totalConsumption"
-                ,type = "number"
-                ,class = "form-control"
-                ,value = NA_integer_
-                ,placeholder = "0 — 999999.99"
-                ,min = 0
-                ,max = 999999
-                ,step = 1
+          class = "row",
+          tags$label(class = "col-sm-5 col-form-label",
+                     "Quantity",
+                     `for` = "totalConsumption"),
+          tags$div(
+            class = "col-sm-7",
+            tags$div(
+              class = "form-group shiny-input-container",
+              tags$input(
+                id = "totalConsumption",
+                type = "number",
+                class = "form-control",
+                value = NA_integer_,
+                placeholder = "0 — 999999.99",
+                min = 0,
+                max = 999999,
+                step = 1
               )
             )
           )
         ),
-
-
+        
+        
 # Period ------------------------------------------------------------------
-
+        
         dateRangeInput(
-          inputId = "period"
-          ,"Period"
-          ,start = today - 1L
-          ,end = today
-          ,separator = "to"
-          ,format = "yyyy, M d"
+          inputId = "period",
+          "Period",
+          start = today - 1L,
+          end = today,
+          separator = "to",
+          format = "yyyy, M d"
         ),
-
-
+        
+        
 # location (MaLo / MeLo) --------------------------------------------------
-
-        textInput(
-          "marketLocation"
-          ,"Location"
-        ),
-
-
-# market part (Strom: MSB, Gas: Netzbetreiber) --------------------------------------------------
-
-        textInput(
-          "marketPartnerNumber"
-          ,"Market partner number"
-        ),
-
-
-# Register --------------------------------------------------
-
-        textInput(
-          "register"
-          ,"Register"
-          ,placeholder = "e.g. 1-1:1.29.0"
-        ),
-
-
+        
+        textInput("marketLocation",
+                  "Location"),
+        
+        
+# market partner (Strom: MSB, Gas: Netzbetreiber) -------------------------
+        
+        textInput("marketPartnerNumber",
+                  "Market partner number"),
+        
+        
+# Register ----------------------------------------------------------------
+        
+        textInput("register",
+                  "Register",
+                  placeholder = "e.g. 1-1:1.29.0"),
+        
+        
 # Receiver, only needed when MSCONS format is desired ---------------------
-
-        div(
-          id = "receiverInput",
-          textInput(
-            "receiver"
-            ,"Receiver"
-          )
-        ) |>
+        
+        div(id = "receiverInput",
+            textInput("receiver"
+                      , "Receiver")) |  >
           # CSS to hide the element by default
-          htmltools::tagAppendAttributes(
-            style = "display:none"),
-
-
-
-
+          htmltools::tagAppendAttributes(style = "display:none"),
+        
+        
 # Action button (generate output) -----------------------------------------
-
+        
         div(
-          class="d-grid gap-2 pt-3"
-          ,actionButton(
-            "generate"
-            ,"Generate"
-            ,class = "btn-primary fw-normal fs-6"
-            )
-          ,actionButton(
-            "copyToClipboard"
-            ,label = "Copy to clipboard"
-            ,class = "btn-secondary fw-normal fs-6"
-            )
-          )
+          class = "d-grid gap-2 pt-3",
+          actionButton("generate",
+                       "Generate",
+                       class = "btn-primary fw-normal fs-6"),
+          actionButton("copyToClipboard",
+                       label = "Copy to clipboard",
+                       class = "btn-secondary fw-normal fs-6")
+        ),
+        tags$small(class = "p-2",
+                   tags$div(
+                     tags$p(
+                       "Spotted something or have an improvement to suggest?",
+                       tags$a("Open an issue",
+                              href = "https://github.com/flrd/loadCurves/issues",
+                              target = "_blank")
+                     ),
+                   ))
+      )
+    ),
+    
+    
+# mainPanel ---------------------------------------------------------------
 
-
-          ,tags$small(class = "p-2"
-            ,tags$div(
-              tags$p("Spotted something or have an improvement to suggest?", 
-              tags$a("Open an issue", href = "https://github.com/flrd/loadCurves/issues", target="_blank")
-              ),
-              )
-            )
-)
-),
-
-
-        # mainPanel(width = 9,
-# "col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3"
-      tags$div(class = "col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-8 col-xxl-9", role="main",
-          verbatimTextOutput("outputMessage") |>
-            # make the text output editable
-            htmltools::tagAppendAttributes(contenteditable="true")
-          )
+    tags$div(
+      class = "col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-8 col-xxl-9",
+      role = "main",
+      verbatimTextOutput("outputMessage") |  >
+        # make the text output editable
+        htmltools::tagAppendAttributes(contenteditable = "true")
     )
+  )
 )
 
 # Define server logic required to draw a histogram
