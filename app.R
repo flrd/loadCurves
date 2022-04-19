@@ -191,7 +191,7 @@ ui <- fixedPage(
         
         div(id = "receiverInput",
             textInput("receiver"
-                      , "Receiver")) |  >
+                      , "Receiver")) |>
           # CSS to hide the element by default
           htmltools::tagAppendAttributes(style = "display:none"),
         
@@ -225,7 +225,7 @@ ui <- fixedPage(
     tags$div(
       class = "col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-8 col-xxl-9",
       role = "main",
-      verbatimTextOutput("outputMessage") |  >
+      verbatimTextOutput("outputMessage") |>
         # make the text output editable
         htmltools::tagAppendAttributes(contenteditable = "true")
     )
@@ -364,7 +364,6 @@ server <- function(input, output, server) {
           marketPartnerNumber = input$marketPartnerNumber
           ,register = input$register
           ,energyType = energyType()
-          ,valueInterval = valueInterval()
           ,marketLocation = input$marketLocation
           ,locationType = locationType()
           )
@@ -375,6 +374,7 @@ server <- function(input, output, server) {
         loadCurveSets_fun(
           periodStart = input$period[[1]]
           ,periodEnd = input$period[[2]]
+          ,valueInterval = valueInterval()
         )
       })
 
