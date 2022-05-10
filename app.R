@@ -234,10 +234,6 @@ ui <- fixedPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output, server) {
-  
-    # dateRange input returns date class, here we make it date-time class
-    periodStart <- reactive({ as.POSIXlt(input$period[[1]]) })
-    periodEnd <- reactive({ as.POSIXlt(input$period[[2]]) })
     
     # energyType equals 1 for elec, 2 for gas, same for locationType
     energyType <- locationType <- reactive({ if(elecTrue()) 1L else 2L })
@@ -255,24 +251,29 @@ server <- function(input, output, server) {
       )
     })
     
+    # dateRange input returns date class, here we make it date-time class
+    periodStart <- reactive({ as.POSIXlt(input$period[[1]]) })
+    periodEnd <- reactive({ as.POSIXlt(input$period[[2]]) })
     
-    # based on start date, end date and interval, generate a time sequence
-    # starting at periodStart to periodEnd
+    # based on start date, end date and interval, generates a sequence
+    # from periodStart + offset to periodEnd
     timeSequence <- reactive({
       interval(
         from = periodStart()
         ,to = periodEnd()
         ,by = input$interval
+        # ,offset = valueInterval()
       )
     })
     
     
-    # get the length of the time sequence
-    n <- reactive({ length(timeSequence()) })
+    # get the length of the time sequence - 1, see:
+    # https://en.wikipedia.org/wiki/Off-by-one_error#Fencepost_error
+    n <- reactive({ length(timeSequence()) - 1})
     
     
     # date-times based on desired output format in JSON object
-    timeSequenceJSON <- reactive({ format(timeSequence(), format = "%Y-%m-%d %H:%M:%S") })
+    timeSequenceJSON <- reactive({ format(timeSequence()[-(n()+1)], format = "%Y-%m-%d %H:%M:%S") })
     
     
     # for MSCONS we need 2 time sequences:
@@ -288,10 +289,10 @@ server <- function(input, output, server) {
       
       list(
         "JSON" = values(n = n(), totalConsumption = input$totalConsumption),
-        "MSCONS" = values(n = n() - 1, totalConsumption = input$totalConsumption)
+        "MSCONS" = values(n = n(), totalConsumption = input$totalConsumption)
+        # "MSCONS" = values(n = n(), totalConsumption = input$totalConsumption)
         )
       })
-    
     
     # check for energy type: TRUE for electricity, FALSE for gas
     elecTrue <- reactive({ input$energyType == "Electricity" })

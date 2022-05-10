@@ -83,7 +83,7 @@ UNB_NADsegments <- function(sender, receiver, energyType) {
   )[[energyType]]
   
   # the pattern %1$s reads as 'take the first values from the ... arguments, %2$s the second, %3$d third etc.'
-  UNB <- sprintf("UNB+UNOC:3+%1$s:%3$d+%2$s:%3$d+210917:%3$d+DCBKCICHBBCECD++TL'", sender, receiver, UNB_value)
+  UNB <- sprintf("UNB+UNOC:3+%1$s:%3$d+%2$s:%3$d+%4$s+DCBKCICHBBCECD++TL'", sender, receiver, UNB_value, format(Sys.time(), "%y%m%d:%H%M"))
   NAD_Sender <- sprintf("NAD+MS+%s::%d'", sender, NAD_value)
   NAD_Receiver <- sprintf("NAD+MR+%s::%d'", receiver, NAD_value)
   return(

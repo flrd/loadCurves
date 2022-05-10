@@ -39,7 +39,7 @@ MSCONS <- function(
       ,UNB
       ,"UNH+DCBKCICHBBCFBG+MSCONS:D:04B:UN:2.3c'"
       ,"BGM+7+04372109171600149903913000003056310+9'"
-      ,"DTM+137:202103171500:203'"
+      ,sprintf("DTM+137:%s:203'", format(Sys.time(), "%Y%m%d%H%M"))
       ,RFF
       ,NAD_Sender
       ,NAD_Receiver
