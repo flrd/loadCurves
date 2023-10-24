@@ -12,12 +12,11 @@ validateOBIS <- function(register) {
 
 RFFsegment <- function(energyType) {
   
-  if (energyType == "Electricity") {
+  if (identical(energyType, "Electricity")) {
     return("RFF+Z13:13018'")
   } else {
     return("RFF+Z13:13008'")
   }
-  
 }
 
 
@@ -36,25 +35,21 @@ PIAsegment <- function(register) {
     
   } else if (register == "" || is.null(register)) {
     PIA <- "PIA+5+{{Register}}:SRW'"
-    
+ 
   } else {
     PIA <- sprintf("PIA+5+%s:SRW'", register)
   }
-  
   return(PIA)
-  
 }
 
 
 # LOC segment -------------------------------------------------------------
 
 LOCsegment <- function(marketLocation) {
-  if (marketLocation == "" || is.null(marketLocation)) {
+  if (identical(marketLocation, "") || is.null(marketLocation)) {
     marketLocation <- "{{Market Location}}"
   }
-  
   LOC <- sprintf("LOC+172+%s'", marketLocation)
-  
   return(LOC)
 }
 
@@ -63,11 +58,11 @@ LOCsegment <- function(marketLocation) {
 
 UNB_NADsegments <- function(sender, receiver, energyType) {
   
-  if(sender == "" || is.null(sender)) {
+  if(identical(sender, "") || is.null(sender)) {
     sender <- "{{Sender}}"
   } 
   
-  if (receiver == "" || is.null(receiver)) {
+  if (identical(receiver, "") || is.null(receiver)) {
     receiver <- "{{Receiver}}"
   } 
   

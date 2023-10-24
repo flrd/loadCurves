@@ -273,7 +273,7 @@ server <- function(input, output, server) {
     
     
     # date-times based on desired output format in JSON object
-    timeSequenceJSON <- reactive({ format(timeSequence()[-(n()+1)], format = "%Y-%m-%d %H:%M:%S") })
+    timeSequenceJSON <- reactive({ format(timeSequence()[-(n()+1)], format = "%Y-%m-%dT%H:%M:%SZ") })
     
     
     # for MSCONS we need 2 time sequences:
