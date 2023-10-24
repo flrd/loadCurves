@@ -37,7 +37,7 @@ MSCONS <- function(
     c(
       "UNA:+.? '"
       ,UNB
-      ,"UNH+DCBKCICHBBCFBG+MSCONS:D:04B:UN:2.3c'"
+      ,"UNH+DCBKCICHBBCFBG+MSCONS:D:04B:UN:2.4b'"
       ,"BGM+7+04372109171600149903913000003056310+9'"
       ,sprintf("DTM+137:%s:203'", format(Sys.time(), "%Y%m%d%H%M"))
       ,RFF
