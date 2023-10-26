@@ -273,7 +273,7 @@ server <- function(input, output, server) {
     
     
     # date-times based on desired output format in JSON object
-    timeSequenceJSON <- reactive({ format(timeSequence()[-(n()+1)], format = "%Y-%m-%dT%H:%M:%SZ") })
+    timeSequenceJSON <- reactive({ format(timeSequence()[-(n()+1)], format = "%Y-%m-%dT%T+00:00") })
     
     
     # for MSCONS we need 2 time sequences:
@@ -313,14 +313,14 @@ server <- function(input, output, server) {
             ,condition = elecTrue()
             
             # to be shown for electricity contracts
-            ,valuesElec = list("Market location"
-                              ,"Metering point operator"
+            ,valuesElec = list("Market location ID"
+                              ,"Metering point operator ID"
                               ,"BDEW / ILN number"
                               ,"e.g. 1-1:1.29.0")
             
             # to be shown for gas contracts
-            ,valuesGas = list("Meter location"
-                               ,"Grid operator"
+            ,valuesGas = list("Meter location ID"
+                               ,"Grid operator ID"
                                ,"VDEW / ILN number"
                                ,"e.g. 7-1:3.1.0")
             )
@@ -352,7 +352,7 @@ server <- function(input, output, server) {
 
     # if desired output is MSCONS, show receiverInput element
     observe({
-        shinyjs::toggle("receiverInput", anim = TRUE, condition = input$outputFormat == "MSCONS")
+        shinyjs::toggle("receiverInput", anim = TRUE, condition = identical(input$outputFormat, "MSCONS"))
     })
     
 
@@ -385,7 +385,7 @@ server <- function(input, output, server) {
         channelInformation_fun(
           messageReference = strtrim(uuid::UUIDgenerate(), width = 32)
           ,sender = input$marketPartnerNumber
-          ,messageDateTime = Sys.time()
+          ,messageDateTime = format(Sys.time(), format = "%FT%T+00:00", tz = "CET")
         )
       })
 
