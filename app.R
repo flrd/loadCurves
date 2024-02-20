@@ -118,7 +118,6 @@ ui <- fixedPage(
               label = NULL,
               choices =
                 list(
-                  "5 minutes" = "5 mins",
                   "15 minutes" = "15 mins",
                   "30 minutes" = "30 mins",
                   "60 minutes" = "hour",
@@ -184,7 +183,9 @@ ui <- fixedPage(
         
         textInput("register",
                   "Register",
-                  placeholder = "e.g. 1-1:1.29.0"),
+                  placeholder = "e.g. 1-1:1.29.0",
+                  value = "1-1:1.29.0"
+                  ),
         
         
 # Receiver, only needed when MSCONS format is desired ---------------------
@@ -243,7 +244,6 @@ server <- function(input, output, server) {
     valueInterval <- reactive({ 
       switch(
         EXPR = input$interval,
-        "5 mins" = 5L,
         "15 mins" = 15L,
         "30 mins" = 30L,
         "hour" = 60L,
@@ -301,6 +301,10 @@ server <- function(input, output, server) {
     # change the placeholder in the text inputs
     # conditionally on the energy type
     observeEvent(input$energyType, {
+      
+      # change default value
+      updateTextInput(inputId = "register",
+                      value = ifelse(elecTrue(), "1-1:1.29.0", "7-1:3.1.0"))
 
         # change the placeholder for:
         # market location, market partner, receiver, register
@@ -378,8 +382,7 @@ server <- function(input, output, server) {
           ,valueInterval = valueInterval()
         )
       })
-
-
+      
       channelInformation <- reactive({
         
         channelInformation_fun(
@@ -387,12 +390,12 @@ server <- function(input, output, server) {
           ,sender = input$marketPartnerNumber
           ,messageDateTime = format(Sys.time(), format = "%FT%T+00:00", tz = "CET")
         )
-      })
+      }) |> bindEvent(input$generate)
 
       
       qty <- reactive({
         paste(
-          sprintf('{"timestamp":"%s","quantity":"%s","quality":1,"createdBy":"string"}'
+          sprintf('{"timestamp":"%s","quantity":"%s","quality":1,"createdBy":""}'
                   , timeSequenceJSON(), quantity()[["JSON"]]),
           collapse = ","
         )
