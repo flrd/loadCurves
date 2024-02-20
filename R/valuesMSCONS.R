@@ -4,6 +4,7 @@ valuesMSCONS <- function(intervalStarts, intervalEnds, quantity) {
   # the 1st element in the list will contain the values
   # the 2st element in the list will contain the starts of measurement
   # the 3st element in the list will contain the ends of measurement
+  
   Map(sprintf,
       list(
         quantity = quantity
@@ -14,6 +15,6 @@ valuesMSCONS <- function(intervalStarts, intervalEnds, quantity) {
                  ,"DTM+164:%s?+02:303'")) |>
   # do.call (paste, ...) concatenates the elements of the lists into single character vector
   # for the pipe operator see ?`|>`
-    (function(l) do.call(paste, c(l, sep = "\n")))()
+    (function(lst) do.call(paste, c(lst, sep = "\n")))()
 }
 

@@ -269,11 +269,11 @@ server <- function(input, output, server) {
     
     # get the length of the time sequence - 1, see:
     # https://en.wikipedia.org/wiki/Off-by-one_error#Fencepost_error
-    n <- reactive({ length(timeSequence()) - 1})
+    n <- reactive({ length(timeSequence())})
     
     
     # date-times based on desired output format in JSON object
-    timeSequenceJSON <- reactive({ format(timeSequence()[-(n()+1)], format = "%Y-%m-%dT%T+00:00") })
+    timeSequenceJSON <- reactive({ format(timeSequence()[-n()], format = "%Y-%m-%dT%T+00:00") })
     
     
     # for MSCONS we need 2 time sequences:
@@ -288,9 +288,8 @@ server <- function(input, output, server) {
     quantity <- reactive({
       
       list(
-        "JSON" = values(n = n(), totalConsumption = input$totalConsumption),
-        "MSCONS" = values(n = n(), totalConsumption = input$totalConsumption)
-        # "MSCONS" = values(n = n(), totalConsumption = input$totalConsumption)
+        "JSON" = values(n = n() - 1, totalConsumption = input$totalConsumption),
+        "MSCONS" = values(n = n() - 1, totalConsumption = input$totalConsumption)
         )
       })
     
